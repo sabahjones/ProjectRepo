@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Black Belt (in development)</title>
+  </head>
+  <body>
+    <h2>Welcome!</h2>
+    <form action="/register" method="POST">
+      {% csrf_token %}
+      <table>
+        <tr><td>Name: </td><td><input type="text" name="name"></td></tr>
+        <tr><td>Email: </td><td><input type="text" name="email"></td></tr>
+        <tr><td>Password: </td><td><input type="password" name="password"></td></tr>
+        <tr><td>Confirm password: </td><td><input type="password" name="password2"></td></tr>
+        <tr><td>Date of birth: </td><td><input type="date" name="birthday"></td></tr>
+      </table>
+      <input type="submit" value="Register">
+    </form>
+
+    {% for message in messages%}
+      <h4><i>{{message}}</i></h4>
+    {% endfor %}
+
+    <h3>Login:</h3>
+    <form action="/login" method="POST">
+      {% csrf_token %}
+      <table>
+        <tr><td>Email: </td><td><input type="text" name="email"></td></tr>
+        <tr><td>Password: </td><td><input type="password" name="password"></td></tr>
+      </table>
+    <input type="submit" value="Login">
+    </form>
+
+
+
+  </body>
+</html>

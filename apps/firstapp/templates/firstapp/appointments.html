@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Black Belt Exam - development</title>
+  </head>
+  <body>
+    <br>
+    <h3>Welcome {{request.session.name}}!</h3>
+
+    <h4>Today's appointments:</h4>
+      <table name="events">
+        <tr><th>Task</th><th>Time</th><th>status</th><th>actions</th></tr>
+        {% for t in todayappt %}
+        <tr><td>{{t.task}}</td><td>{{t.time}}</td><td>{{t.status}}</td><td><a href="edit/{{t.id}}">edit</a> | <a href="/delete/{{t.id}}">delete</a></td></tr>
+        {% endfor %}
+      </table>
+    <br>
+    <h4>Future appointments</h4>
+      <table>
+        <tr><th>Task</th><th>Time</th><th>status</th><th>actions</th></tr>
+        {% for t in tomappt %}
+        <tr><td>{{t.task}}</td><td>{{t.time}}</td><td>{{t.status}}</td><td><a href="edit/{{t.id}}">edit</a> | <a href="/delete/{{t.id}}">delete</a></td></tr>
+        {% endfor %}
+      </table>
+
+<!--         <tr><th>Task</th><th>Time</th><th>status</th><th>actions</th></tr>
+{% for appointment in appointments%}
+<tr><td>{{appointment.task}}</td><td>{{appointment.time}}</td><td>{{appointment.status}}</td><td><a href="edit/{{appointment.id}}">edit</a> | <a href="/delete/{{appointment.id}}">rem</a></td></tr>
+{% endfor %}
+      </table>
+    {% for userinfo in user %}
+ -->
+    <br>
+    <h4>Add new appointment:</h4>
+
+    <form action="/makeapp/{{userinfo.id}}" method="POST">
+      {% csrf_token %}
+      Date: <input type="date" name="date"><br>
+      Time: <input type="time" name="time"><br>
+      Task: <input type="text" name ="task"><br>
+      <input type="hidden" name="userid" value = {{userinfo.id}}>
+      <input type="submit" value ="add">
+    </form>
+      {% endfor %}
+
+      {% for message in messages %}
+      <h4><i>{{message}}</i></h4>
+      {% endfor %}
+      <br>
+      <a href="/logoff"><button>Logoff</button></a><a href="/"><button>Home</button></a>
+
+  </body>
+</html>
