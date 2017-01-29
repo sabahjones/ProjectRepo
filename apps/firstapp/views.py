@@ -9,8 +9,14 @@ from .models import *
 
 def index(request):
     today = datetime.now()
+    print "today is ", today
+    today -= timedelta(hours=6)
+    print "today really is ", today
     tomorrow = today + timedelta(days=1)
-    print "date now = ", today
+    what_is = type(today)
+    print "value of today.year", today.year
+    print "value of today.day", today.day
+    print "value of today.month", today.month
     print "same time tomorrow is ", tomorrow
     return render(request, 'firstapp/index.html')
 
@@ -19,15 +25,14 @@ def appointments(request):
     user = Users.objects.filter(email=request.session['email'])
     for u in user:
         id = user
-    #appointments = Appointments.objects.filter(user_id=u.id).order_by('time')
+        #appointments = Appointments.objects.filter(user_id=u.id).order_by('time')
     today = datetime.now()
+    today -= timedelta(hours=6)
     tomorrow = today + timedelta(days=1)
-
+    pastapps = Appointments.objects.filter(user_id=u.id).filter(time__lt=today).order_by('time')
     todayappt = Appointments.objects.filter(user_id=u.id).filter(time__range=[today, tomorrow]).order_by('time')
-    tomappt = Appointments.objects.filter(user_id=u.id).exclude(time__range=[today, tomorrow]).order_by('time')
-
-    context = {"user": user, 'appointments': appointments, 'todayappt': todayappt, 'tomappt': tomappt}
-
+    tomappt = Appointments.objects.filter(user_id=u.id).filter(time__gt=tomorrow).order_by('time')
+    context = {"user": user, 'appointments': appointments, 'todayappt': todayappt, 'tomappt': tomappt, 'pastapps': pastapps}
     return render(request, 'firstapp/appointments.html', context)
 
 
@@ -86,6 +91,7 @@ def makeapp(request, id):
         datetimevar = request.POST['date'] + str(" ") + str(request.POST['time'])
         print "concat date and time value is ", datetimevar
         today = datetime.now()
+        today -= timedelta(hours=6)
         if len(request.POST['task']) < 1:
             messages.error(request, "please enter a name for your appointment in task")
             errors = "true"
@@ -112,12 +118,28 @@ def edit(request, id):
 
 
 def update(request, id):
+    id2=id
     if request.method =="POST":
         newtime = request.POST['date'] + str(" ") + str(request.POST['time'])
-        print "new time is ", newtime
-        print "passed id =", id
+        errors = "false"
+        rightnow = datetime.now()
+        rightnow -= timedelta(hours=6)
+
+        if len(request.POST['task']) < 1:
+            messages.error(request, "please enter a name for your appointment in task")
+            errors = "true"
+            return redirect('/edit/'+id)
+        if request.POST['status'] != "Pending":
+            Appointments.objects.filter(id=id).update(task=request.POST['task'], status=request.POST['status'])
+            return redirect('/appointments')
+        if newtime < str(rightnow):
+            messages.error(request, 'Please enter a valid appointment date/time')
+            errors = "true"
+        if errors == "true":
+            return redirect('/edit/'+id)
         print request.POST['task'], request.POST['status']
         Appointments.objects.filter(id=id).update(task=request.POST['task'], status=request.POST['status'], time = newtime)
+
     return redirect('/appointments')
 
 

@@ -8,7 +8,7 @@
     <br>
     <h3>Welcome {{request.session.name}}!</h3>
 
-    <h4>Today's appointments:</h4>
+    <h3>Today's appointments:</h3>
       <table name="events">
         <tr><th>Task</th><th>Time</th><th>status</th><th>actions</th></tr>
         {% for t in todayappt %}
@@ -16,7 +16,8 @@
         {% endfor %}
       </table>
     <br>
-    <h4>Future appointments</h4>
+
+    <h3>Future appointments</h3>
       <table>
         <tr><th>Task</th><th>Time</th><th>status</th><th>actions</th></tr>
         {% for t in tomappt %}
@@ -49,6 +50,15 @@
       {% endfor %}
       <br>
       <a href="/logoff"><button>Logoff</button></a><a href="/"><button>Home</button></a>
+
+      <h4>Past appointments:</h4>
+
+      <table>
+        <tr><th>Task</th><th>Time</th><th>status</th><th>actions</th></tr>
+        {% for p in pastapps %}
+        <tr><td>{{p.task}}</td><td>{{p.time}}</td><td>{{p.status}}</td><td><a href="edit/{{p.id}}">edit</a> | <a href="/delete/{{p.id}}">delete</a></td></tr>
+        {% endfor %}
+      </table>
 
   </body>
 </html>
