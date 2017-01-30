@@ -8,6 +8,9 @@ from datetime import timedelta
 from .models import *
 
 def index(request):
+    if 'name' in request.session:
+        return redirect('/appointments')
+
     today = datetime.now()
     print "today is ", today
     today -= timedelta(hours=6)
@@ -17,6 +20,7 @@ def index(request):
     print "value of today.year", today.year
     print "value of today.day", today.day
     print "value of today.month", today.month
+    print "today's entire date is", today.date()
     print "same time tomorrow is ", tomorrow
     return render(request, 'firstapp/index.html')
 
@@ -29,10 +33,13 @@ def appointments(request):
     today = datetime.now()
     today -= timedelta(hours=6)
     tomorrow = today + timedelta(days=1)
+
     pastapps = Appointments.objects.filter(user_id=u.id).filter(time__lt=today).order_by('time')
-    todayappt = Appointments.objects.filter(user_id=u.id).filter(time__range=[today, tomorrow]).order_by('time')
-    tomappt = Appointments.objects.filter(user_id=u.id).filter(time__gt=tomorrow).order_by('time')
+    todayappt = Appointments.objects.filter(user_id=u.id).filter(time__range=[today, tomorrow.date()]).order_by('time')
+    tomappt = Appointments.objects.filter(user_id=u.id).filter(time__gt=tomorrow.date()).order_by('time')
+
     context = {"user": user, 'appointments': appointments, 'todayappt': todayappt, 'tomappt': tomappt, 'pastapps': pastapps}
+
     return render(request, 'firstapp/appointments.html', context)
 
 
@@ -113,12 +120,32 @@ def makeapp(request, id):
 
 def edit(request, id):
     edit = Appointments.objects.filter(id=id)
-    context = {'edit': edit}
+    for e in edit:
+        year = e.time
+    print "match this", year
+    month = year.month
+    if month < 10:
+        month = str(0) + str(month)
+    day = year.day
+    if day < 10:
+        day = str(0) + str(day)
+    hour = year.hour
+    if hour < 10:
+        hour = str(0) + str(hour)
+    minute = year.minute
+    if minute < 10:
+        minute = str(0) + str(minute)
+
+    madedate = str(year.year) + "-" + str(month) + "-" + str(day)
+    madetime = str(hour) + ":" + str(minute)
+
+    print "time: ", madetime
+    print "madedate =", madedate
+    context = {'edit': edit, 'madedate': madedate, 'madetime': madetime}
     return render(request, 'firstapp/edit.html', context)
 
 
 def update(request, id):
-    id2=id
     if request.method =="POST":
         newtime = request.POST['date'] + str(" ") + str(request.POST['time'])
         errors = "false"
@@ -138,6 +165,7 @@ def update(request, id):
         if errors == "true":
             return redirect('/edit/'+id)
         print request.POST['task'], request.POST['status']
+
         Appointments.objects.filter(id=id).update(task=request.POST['task'], status=request.POST['status'], time = newtime)
 
     return redirect('/appointments')

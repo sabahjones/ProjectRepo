@@ -15,14 +15,15 @@
               <option value="Done">Done</option>
               <option value="Missed">Missed</option>
               </select><br>
-      Date: <input type="date" name="date"><br>
-      Time: <input type="time" name="time"><br>
-      <b><i>currently scheduled for {{appt.time}}</i></b>
+      Date: <input type="date" name="date" value="{{madedate}}"><br>
+      Time: <input type="time" name="time" value="{{madetime}}"><br>
+
+<!--       <b><i>currently scheduled for {{appt.time}}</i></b> -->
       <br>
       <input type="submit" value="update">
     </form>
+    <a href="/appointments"><button>cancel</button></a>
     {% endfor %}
-
     {% for message in messages%}
       <h4><i>{{message}}</i></h4>
     {% endfor %}
